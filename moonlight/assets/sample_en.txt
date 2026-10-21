@@ -1,0 +1,137 @@
+How Computers Store Text
+
+A computer does not know what a letter is. Deep inside, everything it stores is a long sequence of bits, tiny switches that are either off or on, written as 0 or 1. Eight bits make a byte, and a single byte can take 256 different values, from 0 to 255. To store text, we need an agreement that maps characters to numbers and numbers to bytes. Such an agreement is called a character encoding.
+
+One of the earliest widely used encodings was ASCII, published in the 1960s. It assigns numbers from 0 to 127 to the English alphabet, the digits, common punctuation marks and a few control characters such as the line feed and the tab. In ASCII the capital letter A is 65, the lowercase letter a is 97, and the digit 0 is 48. ASCII worked well for English, but it had no room for the letters of most other languages.
+
+Unicode solved this problem by giving every character in every writing system its own number, called a code point. Today Unicode covers well over a hundred thousand characters, including Latin, Cyrillic, Arabic, Chinese and Devanagari letters, mathematical symbols and emoji. A code point is usually written in hexadecimal with a U+ prefix, so the Latin letter A is U+0041.
+
+A code point still has to be turned into bytes. The most popular way to do this is UTF-8. It uses one byte for the 128 ASCII characters, two bytes for most European and Cyrillic letters, three bytes for most Chinese, Japanese and Korean characters, and four bytes for emoji and other rare symbols. Because the ASCII range is unchanged, any plain English file is already valid UTF-8. This backward compatibility is one of the main reasons UTF-8 became the dominant encoding on the web.
+
+Language models build on the same idea. A tokenizer splits text into pieces called tokens and gives each piece an id. A byte-level tokenizer starts from the 256 possible byte values, so it can represent any text at all, and then learns to merge frequent pairs of pieces into longer tokens. Common words become single tokens, while rare words are spelled out from smaller parts. Nothing is ever lost: decoding the ids gives back exactly the original bytes.
+
+The Water Cycle
+
+The water you drink today may once have fallen as snow on a mountain, flowed through a river, and rested for years in the ocean. Water on Earth moves in a continuous loop called the water cycle, and the energy that drives it comes from the Sun.
+
+Sunlight warms the surface of oceans, lakes and rivers, and some of the water evaporates, turning into invisible water vapor. Plants also release water vapor through tiny pores in their leaves, a process called transpiration. Warm, moist air rises, and as it rises it cools. Cool air cannot hold as much vapor, so the vapor condenses into tiny droplets around specks of dust and salt. Billions of these droplets form a cloud.
+
+When the droplets collide and grow heavy enough, they fall as precipitation: rain, snow, sleet or hail. Some of the water runs off the land into streams and rivers and eventually returns to the sea. Some soaks into the soil and slowly moves downward to become groundwater, which can stay underground for thousands of years before it reaches a spring or a well. Snow and ice can lock water away for even longer.
+
+Almost all of the water on our planet is salt water in the oceans. Only a small fraction is fresh, and most of that is frozen in glaciers and ice caps or hidden underground. The fresh water that is easy for people to reach, in lakes and rivers, is a tiny share of the total. That is why careful use of water matters so much, especially in dry regions where farming depends on irrigation.
+
+Photosynthesis and Respiration
+
+Green plants are remarkable chemists. Using the energy of sunlight, they combine carbon dioxide from the air with water from the soil to make glucose, a simple sugar, and they release oxygen as a by-product. This process is called photosynthesis, and it takes place mainly in the leaves, inside small structures called chloroplasts. The green pigment chlorophyll absorbs red and blue light and reflects green light, which is why leaves look green to us.
+
+The glucose made during photosynthesis is food for the plant. It can be used right away for energy, linked into long chains to form starch for storage, or turned into cellulose to build cell walls. When we eat bread, rice or potatoes, we are eating energy that a plant captured from the Sun.
+
+Living cells release the energy stored in glucose through cellular respiration. In this process glucose reacts with oxygen, producing carbon dioxide, water and usable energy. Animals depend on respiration, but so do plants: they respire day and night, while they photosynthesize only when there is light. Over a whole day, a healthy growing plant makes more sugar than it uses, and the extra is what allows it to grow.
+
+Photosynthesis and respiration fit together like two halves of a circle. One uses carbon dioxide and releases oxygen, the other uses oxygen and releases carbon dioxide. Tiny algae floating in the oceans perform a large share of the world's photosynthesis, so the health of the seas matters for the air we breathe on land.
+
+Why the Sky Is Blue
+
+Sunlight looks white, but it is a mixture of all the colors of the rainbow. When sunlight enters the atmosphere, it meets countless molecules of nitrogen and oxygen. These molecules are much smaller than the wavelength of visible light, and they scatter short wavelengths far more strongly than long ones. This effect is called Rayleigh scattering.
+
+Blue light has a shorter wavelength than red light, so it is scattered across the sky much more than red. When you look at any part of the sky away from the Sun, you see this scattered blue light coming at you from all directions. Violet light has an even shorter wavelength, but sunlight contains less violet, some of it is absorbed high in the atmosphere, and our eyes are more sensitive to blue. Together these facts make the sky appear blue rather than violet.
+
+At sunrise and sunset, sunlight travels through a much thicker layer of air before it reaches your eyes. By the time it arrives, most of the blue has been scattered away, and the remaining light is rich in orange and red. Dust, smoke and tiny droplets in the air can make these colors even more dramatic.
+
+A Short History of Algebra and Algorithms
+
+In the ninth century, the scholar Muhammad ibn Musa al-Khwarizmi worked in Baghdad at a famous center of learning known as the House of Wisdom. His family name points to Khwarazm, a region on the lower Amu Darya river in Central Asia. Al-Khwarizmi wrote a book explaining systematic methods for solving linear and quadratic equations. The Arabic word al-jabr from its title, meaning roughly "restoring" or "completing", gave us the word algebra.
+
+Al-Khwarizmi also wrote about the Hindu decimal number system, with its nine digits and a zero, and about how to calculate with it. When his work was translated into Latin, his name was written as Algoritmi. Over time, the word algorithm came to mean any precise, step-by-step procedure for solving a problem.
+
+An algorithm is like a recipe that leaves nothing to guesswork. Consider the ancient method for finding the greatest common divisor of two whole numbers, described by Euclid. Divide the larger number by the smaller one and keep the remainder. Then replace the larger number with the smaller one and the smaller number with the remainder. Repeat until the remainder is zero; the last nonzero remainder is the answer. For 48 and 18, the steps are 48 = 2 × 18 + 12, then 18 = 1 × 12 + 6, then 12 = 2 × 6 + 0, so the greatest common divisor is 6.
+
+Good algorithms are correct, finish in a reasonable time, and are clear enough that someone else can check them. Computer science studies how the running time of an algorithm grows as its input grows. Searching an unsorted list of a million names one by one may take a million steps, but if the list is sorted, binary search can find any name in about twenty steps, because each comparison cuts the remaining range in half.
+
+The Silk Road
+
+The Silk Road was not a single road but a vast network of routes that linked China with Central Asia, Persia, India, the Middle East and the Mediterranean world. The name was coined in the nineteenth century, but the trade it describes began more than two thousand years ago. Caravans of camels and horses carried silk, porcelain, spices, glass, paper, metals and precious stones from one market town to the next.
+
+Cities such as Samarkand, Bukhara and Merv grew rich as crossroads of this trade. Merchants rested in caravanserais, roadside inns built around a courtyard, where they could water their animals, store goods and exchange news. Most traders traveled only part of the way, so a bolt of silk might change hands many times before it reached a buyer far from where it was woven.
+
+Ideas moved along these routes as well as goods. Religions, languages, artistic styles, crops and technologies spread from one region to another. Papermaking, for example, traveled west from China through Central Asia, and Samarkand became known for its high-quality paper. The Silk Road is a reminder that exchange between distant cultures is not a modern invention.
+
+Probability with Two Dice
+
+Probability measures how likely an event is, on a scale from 0 (impossible) to 1 (certain). When every outcome is equally likely, the probability of an event is the number of favorable outcomes divided by the number of possible outcomes. A fair six-sided die has six equally likely outcomes, so the chance of rolling a four is 1/6, or about 0.167.
+
+Things become more interesting with two dice. There are 6 × 6 = 36 equally likely ordered outcomes, from (1, 1) to (6, 6). The sum of the two dice can be any whole number from 2 to 12, but these sums are not equally likely. Only one outcome gives a sum of 2, namely (1, 1), while six outcomes give a sum of 7: (1, 6), (2, 5), (3, 4), (4, 3), (5, 2) and (6, 1). So the probability of rolling a 7 is 6/36 = 1/6, and the probability of rolling a 2 is only 1/36.
+
+Probabilities of separate events can be combined. If two events cannot happen at the same time, the probability that one or the other happens is the sum of their probabilities. The chance of rolling a sum of 2 or 12 is 1/36 + 1/36 = 1/18. If two events are independent, meaning that one does not affect the other, the probability that both happen is the product of their probabilities. The chance of rolling a six on the first die and a six on the second is 1/6 × 1/6 = 1/36.
+
+A common mistake is called the gambler's fallacy: the belief that after a long run of one result, the opposite result becomes "due". A fair coin that has landed heads five times in a row still has exactly a one-half chance of landing heads on the next toss. The coin has no memory. Over thousands of tosses the share of heads tends to approach one half, but that happens because the early streak is diluted, not because the coin corrects itself.
+
+Compound Interest
+
+Suppose you put 1,000 dollars into a savings account that pays 5 percent interest per year, and you leave the interest in the account. After one year you have 1,050 dollars. In the second year you earn 5 percent not only on the original 1,000 but also on the 50 dollars of interest, so you end the year with 1,102.50 dollars. Earning interest on interest is called compounding.
+
+The general formula is simple. If P is the starting amount, r is the yearly interest rate written as a decimal, and n is the number of years, the final amount is P × (1 + r) to the power n. With P = 1,000, r = 0.05 and n = 10, the result is about 1,628.89 dollars. With simple interest, where interest is paid only on the original amount, the total after ten years would be just 1,500 dollars.
+
+A handy shortcut called the rule of 72 estimates how long it takes money to double: divide 72 by the interest rate in percent. At 6 percent, money doubles in roughly 72 / 6 = 12 years. The same rule works in reverse for debts, which is why unpaid credit card balances with high interest rates can grow surprisingly fast. Inflation also compounds: if prices rise by 3 percent a year, they increase by more than a third in ten years.
+
+Learning to Program
+
+Programming is the art of explaining a task so precisely that a machine can carry it out. Beginners are often surprised that the hardest part is not memorizing the syntax of a language, but breaking a problem into small, clear steps. A good first habit is to describe the solution in plain words before writing any code.
+
+Start with small programs that do something you care about: convert temperatures, count words in a text, keep a list of books you have read, or simulate rolling dice. Run your program often. Every time you add a few lines, test them, so that when something breaks you know exactly where to look. Read error messages slowly and completely; they usually tell you the line number and the kind of problem.
+
+Python is a popular first language because its code is short and readable. Blocks of code are marked by indentation rather than braces, so the visual shape of the program matches its logic. A function that returns the largest number in a list might loop through the items, keep track of the biggest one seen so far, and return it at the end. Writing such functions yourself, even when the language already provides them, teaches you how computers really work.
+
+Professional programmers spend much of their time reading code, not writing it. They give variables meaningful names, keep functions short, write tests that check the behavior of their code automatically, and use version control systems to record every change. Most importantly, they are not afraid of bugs. A bug is simply a gap between what you told the computer to do and what you meant, and finding it is a puzzle worth solving.
+
+Sleep and Memory
+
+Sleep is not wasted time. While we sleep, the brain is busy sorting the experiences of the day, strengthening some memories and letting others fade. Studies have repeatedly shown that people who sleep after learning a new skill or a list of facts remember them better than people who stay awake for the same amount of time.
+
+A night of sleep is made of several cycles, each lasting roughly ninety minutes. Each cycle includes lighter sleep, deep slow-wave sleep and rapid eye movement sleep, often called REM sleep, when most vivid dreaming happens. Deep sleep is especially important for physical recovery and for consolidating facts, while REM sleep appears to help with emotions and creative connections.
+
+Most adults need about seven to nine hours of sleep per night, and teenagers need even more. Regular sleep and wake times, a dark and quiet bedroom, and avoiding bright screens and caffeine late in the evening all make it easier to fall asleep. Pulling an all-night study session before an exam usually backfires: a tired brain is slower, makes more mistakes and recalls less of what was studied.
+
+How Vaccines Train the Immune System
+
+The immune system protects the body by recognizing invaders such as viruses and bacteria and destroying them. When it meets a new germ for the first time, it needs several days to produce the right antibodies and specialized cells. During that time the germ can multiply and cause illness. After the infection is cleared, however, some memory cells remain. If the same germ returns, the immune system recognizes it quickly and responds before it can cause serious harm.
+
+A vaccine teaches the immune system to recognize a germ without causing the disease. Depending on the type, a vaccine may contain a weakened or inactivated form of the germ, a harmless piece of it such as a surface protein, or genetic instructions that let the body's own cells briefly make that protein. In each case the immune system learns what the real germ looks like and forms memory cells.
+
+When many people in a community are immune, a germ has fewer chances to spread from person to person. This protects those who cannot be vaccinated, such as newborn babies or people with certain medical conditions. Vaccination programs have greatly reduced diseases that were once common, and smallpox, which killed millions of people over the centuries, was declared eradicated in 1980.
+
+Writing Clear Explanations
+
+Whether you are writing a school report, documentation for a program or a message to a colleague, clarity is a form of kindness to the reader. A clear explanation starts with the main point, then supports it with details. Readers who only skim the first sentence should still understand what you want to say.
+
+Use short sentences and familiar words when they do the job. Define technical terms the first time you use them, and then use them consistently; switching between several names for the same thing makes readers wonder whether you mean different things. Concrete examples are powerful: a single worked example often explains more than a paragraph of abstract description.
+
+Finally, read your text again after a break, ideally aloud. Sentences that make you stumble will make your readers stumble too. Remove words that do not add meaning, check numbers and names carefully, and ask yourself whether someone new to the topic could follow your reasoning from start to finish.
+
+A Conversation About Recursion
+
+"I still don't understand recursion," said Maya, closing her laptop. "How can a function call itself without running forever?"
+
+"Let's use an example," said her tutor. "Imagine you're standing in a long line and want to know your position, but you can only talk to the person directly in front of you. What would you do?"
+
+"I'd ask them what their position is, and then add one."
+
+"Exactly. And they would do the same thing, asking the person in front of them. Where does it stop?"
+
+"At the first person in line. They know they're number one, so they don't have to ask anyone."
+
+"That's the base case. Every recursive function needs one: a situation simple enough to answer directly. The other part is the recursive step, where the function solves a smaller version of the same problem and uses that answer. As long as each step gets closer to the base case, the process ends."
+
+Maya thought for a moment. "So computing a factorial works the same way? The factorial of 5 is 5 times the factorial of 4, and so on, until we reach the factorial of 1, which is just 1."
+
+"Yes. Five times four times three times two times one gives 120. And if you forget the base case, the calls never stop until the computer runs out of space for them. In Python you would see a RecursionError."
+
+"That actually makes sense," Maya said, opening her laptop again. "I'm going to try writing it myself."
+
+Latitude, Longitude and Time Zones
+
+To describe any place on Earth, geographers use a grid of imaginary lines. Lines of latitude run east and west around the globe, parallel to the equator. Latitude measures how far north or south a place is, from 0 degrees at the equator to 90 degrees at the North and South Poles. Lines of longitude, also called meridians, run from pole to pole. Longitude measures how far east or west a place is from the prime meridian, which passes through Greenwich in London, and it goes up to 180 degrees in each direction.
+
+Together the two numbers form a unique address. Tashkent, for example, lies at roughly 41 degrees north and 69 degrees east, while Buenos Aires lies at about 35 degrees south and 58 degrees west. Each degree is divided into 60 minutes, and each minute into 60 seconds, although modern maps and phones often use decimal degrees instead.
+
+Longitude is closely connected to time. The Earth turns through 360 degrees in about 24 hours, which is 15 degrees per hour. That is why the world is divided into time zones that are, in principle, 15 degrees wide, although their real borders follow countries and regions. When it is noon in London, it is already late afternoon in Tashkent and still early morning in New York. Sailors once found their longitude at sea by comparing local noon with the time shown by an accurate clock set to the time at a known place, and building such reliable clocks was one of the great technical challenges of the eighteenth century.

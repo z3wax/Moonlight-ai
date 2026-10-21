@@ -1,0 +1,67 @@
+[build-system]
+requires = ["setuptools>=77.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "moonlight-llm"
+dynamic = ["version"]
+description = "Moonlight: hybrid Attention + Retention language models (1M to 1T params) for Uzbek and English - model, data, tokenizer, training, chat with tool calling, image input and a tiered benchmark harness."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "Apache-2.0"  # SPDX expression (PEP 639); LICENSE is auto-included
+authors = [{ name = "Moonlight contributors" }]
+keywords = ["llm", "language-model", "retention", "attention", "uzbek", "pytorch", "muon", "moe"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "torch>=2.1",
+    "numpy",
+    "pyyaml>=6",
+    "tokenizers>=0.15",
+    "safetensors>=0.4",
+    "pyarrow>=12",
+]
+
+[project.optional-dependencies]
+vision = ["transformers>=4.40", "pillow", "sentencepiece"]
+data = ["datasets"]
+wandb = ["wandb"]
+dev = ["pytest", "pytest-timeout", "pyflakes"]
+all = ["moonlight-llm[vision,data,wandb]"]
+
+[project.scripts]
+moonlight = "moonlight.cli:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+version = { attr = "moonlight.version.__version__" }
+
+# Namespace discovery so the data-only directories moonlight/assets and
+# moonlight/benchmarks/suites are proper (data) packages of the distribution.
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["moonlight", "moonlight.*"]
+exclude = ["*.__pycache__", "*.__pycache__.*"]
+namespaces = true
+
+[tool.setuptools.package-data]
+"moonlight.assets" = ["*"]
+"moonlight.benchmarks.suites" = ["*.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
