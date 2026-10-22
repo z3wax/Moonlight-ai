@@ -1,0 +1,15 @@
+name: cc-001
+description: >-
+  Tier 1 (1M-2M params): the weakest chat models. Checks that the chat template is learned (replies
+  end with <|end|>, no special-token leakage), greetings get a sensible (lenient rule) reply, the
+  model knows its name, and language modelling quality (bits per byte, lower is better) on the bundled
+  Uzbek and English samples. Thresholds are lenient: a randomly initialised model fails, a 1M-2M model
+  trained for about an hour passes.
+param_range: [1M, 2M]
+tasks:
+  - {task: chat_format, limit: 20, threshold: 0.5, max_new_tokens: 64}
+  - {task: chat_sanity, limit: 20, threshold: 0.3, lenient: true, max_new_tokens: 32}
+  - {task: identity, limit: 10, threshold: 0.2, max_new_tokens: 48}
+  - {task: perplexity, name: perplexity_uz, limit: 4096, threshold: 2.8, lower_is_better: true, languages: [uz]}
+  - {task: perplexity, name: perplexity_en, limit: 4096, threshold: 3.0, lower_is_better: true, languages: [en]}
+  - {task: speed, limit: 32, threshold: null}

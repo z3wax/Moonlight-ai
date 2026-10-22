@@ -1,0 +1,23 @@
+name: cc-004
+description: >-
+  Tier 4 (150M-300M params): adds ARC-Easy and HellaSwag subsets (log-likelihood), a HumanEval
+  subset, end-to-end tool calling through the real chat tool loop, and IFEval. From this tier on
+  tool_e2e supersedes tool_format, arithmetic is covered by tool_e2e (and gsm8k from cc-005) and
+  Uzbek knowledge by Belebele.
+param_range: [150M, 300M]
+tasks:
+  - {task: chat_format, limit: 50, threshold: 0.85}
+  - {task: chat_sanity, limit: 20, threshold: 0.8, max_new_tokens: 32}
+  - {task: identity, limit: 12, threshold: 0.7}
+  - {task: perplexity, limit: 16384, threshold: 1.6, lower_is_better: true}
+  - {task: tool_e2e, limit: 30, threshold: 0.3}
+  - {task: code_lite, limit: 20, threshold: 0.2}
+  - {task: belebele_uz, limit: 300, threshold: 0.28}
+  - {task: arc_easy, limit: 300, threshold: 0.4}
+  - {task: hellaswag, limit: 300, threshold: 0.3}
+  - {task: humaneval, limit: 40, threshold: 0.02}
+  - {task: ifeval_lite, limit: 30, threshold: 0.15}
+  - {task: detail_check, limit: 20, threshold: 0.4}
+  - {task: plan_bench, limit: 20, threshold: 0.1}
+  - {task: ifeval, limit: 120, threshold: 0.1}
+  - {task: speed, limit: 64, threshold: null}

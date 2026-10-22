@@ -1,0 +1,27 @@
+name: cc-006
+description: >-
+  Tier 6 (7B-13B params): full MMLU / ARC / HellaSwag / GSM8K / HumanEval / MBPP plus long-context
+  passkey retrieval (needle) at 25/50/90% of the context window. Every task runs on its full dataset
+  (limit null) except the bundled sets and the agentic / long-context tasks.
+param_range: [7B, 13B]
+tasks:
+  - {task: chat_format, limit: 50, threshold: 0.95}
+  - {task: chat_sanity, limit: 20, threshold: 0.9, max_new_tokens: 32}
+  - {task: identity, limit: 12, threshold: 0.9}
+  - {task: perplexity, limit: 65536, threshold: 1.1, lower_is_better: true}
+  - {task: tool_e2e, limit: 50, threshold: 0.65}
+  - {task: belebele_uz, limit: null, threshold: 0.5}
+  - {task: arc_easy, limit: null, threshold: 0.7}
+  - {task: arc_challenge, limit: null, threshold: 0.42}
+  - {task: hellaswag, limit: null, threshold: 0.65}
+  - {task: mmlu, limit: null, threshold: 0.45}
+  - {task: gsm8k, limit: null, threshold: 0.3, max_new_tokens: 512}
+  - {task: humaneval, limit: null, threshold: 0.2, max_new_tokens: 512}
+  - {task: mbpp, limit: null, threshold: 0.3, max_new_tokens: 512}
+  - {task: needle, limit: 9, threshold: 0.6}
+  - {task: ifeval_lite, limit: 30, threshold: 0.45}
+  - {task: detail_check, limit: 20, threshold: 0.7}
+  - {task: plan_bench, limit: 20, threshold: 0.35, max_new_tokens: 512}
+  - {task: ifeval, limit: null, threshold: 0.35, max_new_tokens: 768}
+  - {task: project_build, limit: 4, threshold: 0.3, max_steps: 24, max_new_tokens: 1024}
+  - {task: speed, limit: 128, threshold: null}

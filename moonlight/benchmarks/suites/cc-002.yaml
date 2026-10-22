@@ -1,0 +1,16 @@
+name: cc-002
+description: >-
+  Tier 2 (5M-20M params): small chat models. Adds arithmetic-lite (small exact problems),
+  Uzbek knowledge, tool-call format, and lightweight instruction / detail following.
+param_range: [5M, 20M]
+tasks:
+  - {task: chat_format, limit: 30, threshold: 0.7, max_new_tokens: 64}
+  - {task: chat_sanity, limit: 20, threshold: 0.6, max_new_tokens: 32}
+  - {task: identity, limit: 10, threshold: 0.5, max_new_tokens: 48}
+  - {task: perplexity, limit: 8192, threshold: 2.3, lower_is_better: true}
+  - {task: arithmetic, limit: 40, threshold: 0.15}
+  - {task: knowledge_uz, limit: 32, threshold: 0.15}
+  - {task: tool_format, limit: 30, threshold: 0.3}
+  - {task: ifeval_lite, limit: 30, threshold: 0.05, max_new_tokens: 160}
+  - {task: detail_check, limit: 20, threshold: 0.2, max_new_tokens: 160}
+  - {task: speed, limit: 64, threshold: null}

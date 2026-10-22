@@ -1,0 +1,19 @@
+name: cc-003
+description: >-
+  Tier 3 (50M-100M params): adds code-lite (20 bundled problems run against asserts), Belebele
+  Uzbek reading comprehension (log-likelihood, chance 0.25) and verifiable planning problems.
+param_range: [50M, 100M]
+tasks:
+  - {task: chat_format, limit: 40, threshold: 0.8}
+  - {task: chat_sanity, limit: 20, threshold: 0.7, max_new_tokens: 32}
+  - {task: identity, limit: 12, threshold: 0.6}
+  - {task: perplexity, limit: 16384, threshold: 1.9, lower_is_better: true}
+  - {task: arithmetic, limit: 60, threshold: 0.3}
+  - {task: knowledge_uz, limit: 32, threshold: 0.25}
+  - {task: tool_format, limit: 40, threshold: 0.5}
+  - {task: code_lite, limit: 20, threshold: 0.1}
+  - {task: belebele_uz, limit: 200, threshold: 0.26}
+  - {task: ifeval_lite, limit: 30, threshold: 0.1, max_new_tokens: 192}
+  - {task: detail_check, limit: 20, threshold: 0.3, max_new_tokens: 192}
+  - {task: plan_bench, limit: 20, threshold: 0.05, max_new_tokens: 256}
+  - {task: speed, limit: 64, threshold: null}

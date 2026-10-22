@@ -1,0 +1,29 @@
+name: cc-007
+description: >-
+  Tier 7 (16B-70B params, incl. MoE 16B-A2B / 30B-A3B by total size): cc-006 plus image captioning
+  (multimodal models only; skipped otherwise) and multi-tool agent use, with stricter thresholds.
+  Every task runs on its full dataset (limit null) except the bundled sets and the agentic / long-context tasks.
+param_range: [16B, 70B]
+tasks:
+  - {task: chat_format, limit: 50, threshold: 0.95}
+  - {task: chat_sanity, limit: 20, threshold: 0.9, max_new_tokens: 32}
+  - {task: identity, limit: 12, threshold: 0.9}
+  - {task: perplexity, limit: 65536, threshold: 1.0, lower_is_better: true}
+  - {task: tool_e2e, limit: 50, threshold: 0.75}
+  - {task: tool_e2e, name: agent_multi_tool, limit: 30, threshold: 0.5, multi: true, max_new_tokens: 256}
+  - {task: belebele_uz, limit: null, threshold: 0.6}
+  - {task: arc_easy, limit: null, threshold: 0.8}
+  - {task: arc_challenge, limit: null, threshold: 0.55}
+  - {task: hellaswag, limit: null, threshold: 0.75}
+  - {task: mmlu, limit: null, threshold: 0.6}
+  - {task: gsm8k, limit: null, threshold: 0.5, max_new_tokens: 512}
+  - {task: humaneval, limit: null, threshold: 0.35, max_new_tokens: 512}
+  - {task: mbpp, limit: null, threshold: 0.45, max_new_tokens: 512}
+  - {task: needle, limit: 9, threshold: 0.8}
+  - {task: vision_caption, limit: 8, threshold: 0.6}
+  - {task: ifeval_lite, limit: 30, threshold: 0.55}
+  - {task: detail_check, limit: 20, threshold: 0.8}
+  - {task: plan_bench, limit: 20, threshold: 0.5, max_new_tokens: 512}
+  - {task: ifeval, limit: null, threshold: 0.5, max_new_tokens: 768}
+  - {task: project_build, limit: 4, threshold: 0.5, max_steps: 24, max_new_tokens: 1024}
+  - {task: speed, limit: 128, threshold: null}

@@ -78,7 +78,32 @@ def _call(name: str, arguments: Mapping[str, Any]) -> Dict[str, Any]:
 
 
 def _tool(name: str, value: Any) -> Dict[str, Any]:
-    return {"role": "tool", "name": name, "content": json.dumps(value, ensure_ascii=False)}
+    """Tool-result message serialized exactly like ``moonlight.tools.ToolRegistry.call`` does at
+    inference time: strings verbatim, everything else ``json.dumps(..., ensure_ascii=False)``."""
+    content = value if isinstance(value, str) else json.dumps(value, ensure_ascii=False, default=str)
+    return {"role": "tool", "name": name, "content": content}
+
+
+def _calc_result(expression: str, fallback: Any) -> Any:
+    """What the real ``calculator`` tool returns for ``expression`` (e.g. ``41`` for ``123 / 3``),
+    so training data matches inference-time tool results; ``fallback`` if it cannot evaluate."""
+    from moonlight.tools import safe_eval  # torch-free; lazy to keep this module's import light
+
+    try:
+        return safe_eval(expression)
+    except Exception:
+        return fallback
+
+
+def _unit_result(value: float, from_unit: str, to_unit: str, result: float) -> Any:
+    """What the real ``unit_convert`` tool returns (a dict with ``result``), falling back to the
+    same shape built from the locally computed ``result``."""
+    from moonlight.tools import unit_convert
+
+    try:
+        return unit_convert(value, from_unit, to_unit)
+    except Exception:
+        return {"value": value, "from_unit": from_unit, "to_unit": to_unit, "result": round(result, 10)}
 
 
 def _num(x: Any, places: int = 6) -> str:
@@ -140,6 +165,29 @@ WORKSPACE_TOOL_SCHEMAS: Dict[str, Dict[str, Any]] = {
     "run_tests": _schema("run_tests", "Run the test-suite (pytest -q) in the workspace and report the result.",
                          {"target": {"type": "string", "default": "."}}, []),
 }
+
+
+def _use_runtime_schemas() -> None:
+    """Replace the static schemas of tools that exist at inference time with the exact schemas
+    ``moonlight.tools`` renders into the ``<|tools|>`` block (built-ins and workspace tools), so the
+    training prompts match what ChatSession / build_project show the model. The static copies
+    above remain as a fallback if ``moonlight.tools`` cannot be imported."""
+    try:
+        from types import SimpleNamespace
+
+        from moonlight.tools import builtin_tools, workspace_tools
+    except Exception:  # pragma: no cover - moonlight.tools is torch-free and always importable
+        return
+    for t in builtin_tools():
+        if t.name in TOOL_SCHEMAS:
+            TOOL_SCHEMAS[t.name] = t.schema()
+    # workspace_tools only reads ``allow_exec`` at construction; a stand-in avoids creating a directory
+    for t in workspace_tools(SimpleNamespace(allow_exec=True)):  # type: ignore[arg-type]
+        if t.name in WORKSPACE_TOOL_SCHEMAS:
+            WORKSPACE_TOOL_SCHEMAS[t.name] = t.schema()
+
+
+_use_runtime_schemas()
 
 
 # =============================================================================================== identity
@@ -571,8 +619,9 @@ def arithmetic_conversations(n: int = 1000, seed: int = 0, tool_frac: float = 0.
             tools = [TOOL_SCHEMAS["calculator"]] + ([TOOL_SCHEMAS["unit_convert"]] if rng.random() < 0.5 else [])
             value = fn(a, b)  # what python (and the calculator tool) returns, e.g. 41.0 for 123 / 3
             ans = (f"{a} {op} {b} = {res}.\nJavob: {res}" if uz else f"{a} {op} {b} = {res}.\nAnswer: {res}")
-            out.append([_system(tools), _user(q), _call("calculator", {"expression": f"{a} {py_op} {b}"}),
-                        _tool("calculator", value), _asst(ans)])
+            expr = f"{a} {py_op} {b}"
+            out.append([_system(tools), _user(q), _call("calculator", {"expression": expr}),
+                        _tool("calculator", _calc_result(expr, value)), _asst(ans)])
         else:
             ans = (f"{a} {op} {b} = {res}.\nJavob: {res}" if uz else f"{a} {op} {b} = {res}.\nAnswer: {res}")
             out.append([_user(q), _asst(ans)])
@@ -651,6 +700,20 @@ def _iso(dt: Tuple[int, int, int, int, int, int], offset_min: int) -> str:
     return f"{y:04d}-{mo:02d}-{d:02d}T{h:02d}:{mi:02d}:{s:02d}{sign}{hh:02d}:{mm:02d}"
 
 
+_WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+
+def _time_result(tz: str, dt: Tuple[int, int, int, int, int, int], offset_min: int) -> Dict[str, str]:
+    """Same keys as the real ``current_time`` tool: timezone, datetime, date, time, weekday, utc_offset."""
+    import datetime as _datetime
+
+    y, mo, d, h, mi, sec = dt
+    iso = _iso(dt, offset_min)
+    return {"timezone": tz, "datetime": iso, "date": f"{y:04d}-{mo:02d}-{d:02d}",
+            "time": f"{h:02d}:{mi:02d}:{sec:02d}", "weekday": _WEEKDAYS[_datetime.date(y, mo, d).weekday()],
+            "utc_offset": iso[-6:]}
+
+
 def _calc_scenario(rng: random.Random, uz: bool) -> Conversation:
     kind = rng.randrange(4)
     if kind == 0:
@@ -678,14 +741,14 @@ def _calc_scenario(rng: random.Random, uz: bool) -> Conversation:
         q = (f"{base} ning {exp}-darajasi nechchi?" if uz else f"What is {base} to the power of {exp}?")
         a = (f"{base}^{exp} = {value}." if uz else f"{base}^{exp} = {value}.")
     return [_system(_tool_set(rng, ["calculator"])), _user(q), _call("calculator", {"expression": expr}),
-            _tool("calculator", value), _asst(a)]
+            _tool("calculator", _calc_result(expr, value)), _asst(a)]
 
 
 def _time_scenario(rng: random.Random, uz: bool) -> Conversation:
     tz, off, cuz, cen = _pick(rng, _TZ)
     dt = _random_datetime(rng)
     y, mo, d, h, mi, _ = dt
-    result = {"timezone": tz, "datetime": _iso(dt, off)}
+    result = _time_result(tz, dt, off)
     if tz == "UTC":
         q = "Hozir UTC bo'yicha soat necha?" if uz else "What time is it in UTC right now?"
         a = (f"Hozir UTC bo'yicha soat {h:02d}:{mi:02d} ({y}-yil {d}-{_UZ_MONTHS[mo - 1]})." if uz
@@ -711,7 +774,7 @@ def _two_time_scenario(rng: random.Random, uz: bool) -> Conversation:
     day_shift, rem = divmod(total, 24 * 60)
     h2, mi2 = divmod(rem, 60)
     diff = (off2 - off1) / 60
-    r1 = {"timezone": tz1, "datetime": _iso(dt, off1)}
+    r1 = _time_result(tz1, dt, off1)
     msgs = [_system(_tool_set(rng, ["current_time"])),
             _user(f"{cuz1} va {cuz2}da hozir soat necha? Farqi qancha?" if uz
                   else f"What time is it in {cen1} and {cen2}? What's the difference?"),
@@ -729,7 +792,7 @@ def _two_time_scenario(rng: random.Random, uz: bool) -> Conversation:
         if mo2 > 12:
             mo2, y2 = 1, y2 + 1
     dt2 = (y2, mo2, d2, h2, mi2, s)
-    msgs += [_call("current_time", {"timezone": tz2}), _tool("current_time", {"timezone": tz2, "datetime": _iso(dt2, off2)})]
+    msgs += [_call("current_time", {"timezone": tz2}), _tool("current_time", _time_result(tz2, dt2, off2))]
     dtxt = _num(abs(diff))
     if uz:
         rel = ("bir xil" if diff == 0 else f"{cuz2} {cuz1}dan {dtxt} soat " + ("oldinda" if diff > 0 else "orqada"))
@@ -762,7 +825,7 @@ def _unit_scenario(rng: random.Random, uz: bool) -> Conversation:
         a = f"{v} {enf} is {'about ' if approx else ''}{shown} {ent}."
     return [_system(_tool_set(rng, ["unit_convert"])), _user(q),
             _call("unit_convert", {"value": value, "from_unit": fu, "to_unit": tu}),
-            _tool("unit_convert", round(res, 6)), _asst(a)]
+            _tool("unit_convert", _unit_result(value, fu, tu, res)), _asst(a)]
 
 
 def _weather_scenario(rng: random.Random, uz: bool) -> Conversation:
@@ -1711,10 +1774,16 @@ def plan_conversations(n: int = 300, seed: int = 0) -> List[Conversation]:
     (action + expected output + check) and a **Tekshiruv / Verification** checklist mapping every user
     requirement and constraint to the step that satisfies it."""
     rng = _rng("plan", seed)
+    # half of the examples carry the PLAN system prompt that ``LLM.plan`` uses at inference time,
+    # the other half the default system prompt (plans requested in ordinary chat)
+    plan_system = _chat_prompt("PLAN_SYSTEM_PROMPT", "")
     out = []
     for i in range(int(n)):
         prompt, answer, _ = _plan_example(rng, i % 2 == 0)
-        out.append([_user(prompt), _asst(answer)])
+        conv = [_user(prompt), _asst(answer)]
+        if plan_system and (i // 2) % 2 == 1:
+            conv.insert(0, _system(None, plan_system))
+        out.append(conv)
     return out
 
 
@@ -2137,12 +2206,23 @@ def detail_conversations(n: int = 300, seed: int = 0) -> List[Conversation]:
 # =============================================================================================== projects
 
 #: system prompt of synthetic agentic trajectories (Uzbek + English sentence, like the chat.py constants).
-BUILDER_SYSTEM = (
+def _chat_prompt(name: str, fallback: str) -> str:
+    """A system-prompt constant from ``moonlight.chat`` (SPEC §13.6 places PLAN/BUILDER prompts there),
+    so training trajectories use exactly the prompt ``LLM.plan`` / ``LLM.build_project`` use."""
+    try:
+        from moonlight import chat as _chat  # torch-free (tokenizer + tools)
+
+        return str(getattr(_chat, name))
+    except Exception:  # pragma: no cover - fallback if the chat module is unavailable
+        return fallback
+
+
+#: Builder system prompt of the agent trajectories (= ``moonlight.chat.BUILDER_SYSTEM_PROMPT``).
+BUILDER_SYSTEM = _chat_prompt("BUILDER_SYSTEM_PROMPT", (
     "Sen Moonlight — dasturlash agentisan: avval reja tuz, keyin kod va testlarni yoz, testlarni ishga tushir, "
     "xatolarni tuzat va yakunda har bir talab qayerda bajarilganini sanab chiq. You are Moonlight, a coding agent: "
     "plan first, write the code and tests, run the tests, fix failures, and finish with a summary that maps every "
-    "requirement to where it is satisfied."
-)
+    "requirement to where it is satisfied."))
 
 
 def _project(key: str, uz: str, en: str, module: str, code: str, tests: str, reqs: Sequence[Tuple[str, str, str]],
@@ -2556,7 +2636,7 @@ def _run_tests_result(p: Dict[str, Any], buggy: bool, seconds: float) -> Dict[st
     tests = _test_names(p["tests"])
     if not buggy:
         out = _pytest_progress(tests, None) + f"\n{len(tests)} passed in {seconds:.2f}s"
-        return {"passed": True, "output": out}
+        return {"passed": True, "returncode": 0, "runner": "pytest", "output": out}
     name = p["bug"]["test"]
     first_e = p["bug"]["e_lines"][0]
     summary = f"FAILED {p['test_file']}::{name} - {first_e}"
@@ -2566,7 +2646,7 @@ def _run_tests_result(p: Dict[str, Any], buggy: bool, seconds: float) -> Dict[st
     out = "\n".join([_pytest_progress(tests, name), "=" * 35 + " FAILURES " + "=" * 35, _fail_block(p),
                      "=" * 27 + " short test summary info " + "=" * 28, summary,
                      f"1 failed, {n_ok} passed in {seconds:.2f}s"])
-    return {"passed": False, "output": out}
+    return {"passed": False, "returncode": 1, "runner": "pytest", "output": out}
 
 
 def _project_plan(p: Dict[str, Any], uz: bool) -> str:
@@ -2586,8 +2666,10 @@ def _project_plan(p: Dict[str, Any], uz: bool) -> str:
     return "# Plan\n\n" + "\n".join(steps) + f"\n\n## Requirements\n{reqs}\n"
 
 
-def _write_result(path: str, content: str) -> Dict[str, Any]:
-    return {"ok": True, "path": path, "bytes": len(content.encode("utf-8"))}
+def _write_result(path: str, content: str) -> str:
+    """The text ``moonlight.tools.Workspace.write_file`` returns for this write."""
+    n_lines = content.count("\n") + (1 if content and not content.endswith("\n") else 0)
+    return f"wrote {path} ({len(content)} characters, {n_lines} lines)"
 
 
 def project_conversations(n: int = 100, seed: int = 0, bug_frac: float = 0.5) -> List[Conversation]:

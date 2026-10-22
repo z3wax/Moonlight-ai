@@ -187,7 +187,7 @@ def _signature(cfg: Any, tokenizer: Any, offline: bool, scale: float) -> str:
     entries = [{"source": str(_get(e, "source")), "weight": float(_get(e, "weight", 1.0) or 0.0),
                 "max_chars": float(_get(e, "max_chars", 0) or 0)} for e in (cfg.data.pretrain or [])]
     payload = {"entries": entries, "offline": offline, "scale": scale, "languages": list(cfg.data.languages),
-               "tok": hashlib.sha256(tokenizer.to_str().encode("utf-8")).hexdigest()[:16], "v": 1}
+               "tok": hashlib.sha256(tokenizer.to_str().encode("utf-8")).hexdigest()[:16], "v": 2}
     return hashlib.sha256(json.dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()[:20]
 
 
@@ -266,7 +266,16 @@ def build_pretrain_tokens(cfg: Any, tokenizer: Any, out_dir: Any) -> Tuple[Path,
         nonlocal n_docs
         if not buf:
             return
-        encoded = tokenizer.encode_batch([t for _, t in buf])
+        # Raw corpus text may contain literal special-token strings (e.g. "<|end|>" in web pages
+        # quoting other chat templates); they must stay plain text, not control ids. Only our own
+        # synthetic renderings may use real control tokens (e.g. <|think|> ... <|/think|>).
+        encoded: List[Any] = [None] * len(buf)
+        for synthetic in (False, True):
+            idx = [i for i, (src, _) in enumerate(buf) if (src == "synthetic") == synthetic]
+            if idx:
+                got = tokenizer.encode_batch([buf[i][1] for i in idx], allow_special=synthetic)
+                for i, ids in zip(idx, got):
+                    encoded[i] = ids
         for (src, text), ids in zip(buf, encoded):
             row = np.empty(len(ids) + 1, dtype=np.int64)
             row[:-1] = ids
