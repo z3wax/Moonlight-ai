@@ -1,3 +1,13 @@
+<!-- z3wax:presentation:start -->
+![Moonlight AI](docs/brand/banner.svg)
+
+[Loyiha xaritasi va misol](docs/PROJECT_GUIDE.md) · [Roadmap](ROADMAP.md) · [Baholash](docs/EVALUATION.md) · [Changelog](CHANGELOG.md) · [Relizlar](docs/RELEASING.md) · [Model card](docs/MODEL_CARD.md)
+
+**Tekshiruvlar:** [Documentation workflow](https://github.com/z3wax/Moonlight-ai/actions/workflows/documentation.yml) · Mavjud workflowlar: [ci.yml](https://github.com/z3wax/Moonlight-ai/actions/workflows/ci.yml)
+
+Hujjatlar CI holati dastur yoki model testlari holatidan alohida.
+<!-- z3wax:presentation:end -->
+
 # Moonlight
 
 **Gibrid Attention + Retention til modellari oilasi (1M → 1T parametr) — o'zbek va ingliz tillari uchun.**
