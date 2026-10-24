@@ -365,3 +365,19 @@ python scripts/generate_configs.py --check
 ### License
 
 Apache-2.0, see [LICENSE](LICENSE).
+
+
+## Repozitoriy bo'yicha qo'llanma
+
+[Arxitektura](docs/ARCHITECTURE.md) · [Konfiguratsiyalar](docs/CONFIGS.md) · [O'qitish](docs/TRAINING.md) · [Benchmarklar](docs/BENCHMARKS.md)
+
+**Repozitoriy egasi:** [z3wax](https://github.com/z3wax). Mavjud uchinchi tomon muallifligi va litsenziya bildirishnomalari saqlanadi.
+
+O'zgarish yuborish tartibi: [CONTRIBUTING.md](CONTRIBUTING.md).
+
+### Muammoni yuborishda
+
+- Branch va commit SHA, operatsion tizim hamda runtime versiyasini ko'rsating.
+- Minimal qayta chiqarish qadamlari, kutilgan natija va amaldagi javobni yozing.
+- Token, cookie, parol, sessiya va shaxsiy ma'lumotlarni loglardan olib tashlang.
+- Benchmark natijasida qurilma, model/checkpoint, konfiguratsiya va o'lchov usulini kiriting.
